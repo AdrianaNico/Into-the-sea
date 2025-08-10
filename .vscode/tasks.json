@@ -1,0 +1,35 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "cppbuild",
+			"label": "C/C++: g++.exe build active file with SFML",
+			"command": "C:\\msys64\\ucrt64\\bin\\g++.exe",
+			"args": [
+			"-fdiagnostics-color=always",
+			"-g",
+			"${file}",
+			"-I\"D:/libraries/SFML-3.0.0/include\"",
+			"-o",
+			"${fileDirname}\\${fileBasenameNoExtension}.exe",
+			"-L\"D:/libraries/SFML-3.0.0/lib\"",
+			"-lsfml-graphics",
+			"-lsfml-window",
+			"-lsfml-system"
+			
+		],
+
+			"options": {
+				"cwd": "${fileDirname}"
+			},
+			"problemMatcher": [
+				"$gcc"
+			],
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"detail": "compiler: C:\\msys64\\ucrt64\\bin\\g++.exe with SFML"
+		}
+	]
+}
