@@ -6,10 +6,48 @@ int main(){
 
     unsigned int height = 600;
     unsigned int width = 800;
-    sf::RenderWindow* window = new sf::RenderWindow(sf::VideoMode({width, height}), "Move the Circles");
-    sf::CircleShape circle1(50.f);
-    circle1.setFillColor(sf::Color(255, 182, 193));
-    circle1.setPosition(sf::Vector2f(100.f, 100.f)); 
+    sf::RenderWindow* window = new sf::RenderWindow(sf::VideoMode({width, height}), "Into the Sea");
+    //bubble
+    sf::CircleShape bubble(30.f);
+    bubble.setFillColor(sf::Color(173, 216, 230));
+    bubble.setPosition(sf::Vector2f(100.f, 100.f));
+    bubble.setOutlineColor(sf::Color::White);
+    bubble.setOutlineThickness(2.f);
+
+    //turtle
+    sf::Texture turtleTexture;
+    if(!turtleTexture.loadFromFile("turtle.png")){
+        return -1;
+    }
+
+    sf::Sprite turtleSprite(turtleTexture);
+
+    //scalam dimensiunea testoasei dupa dimensiunea window ului
+    sf::Vector2u turtleSize= turtleTexture.getSize();
+    float scaleTurtleX=200.f/ turtleSize.x;
+    float scaleTurtleY=200.f/ turtleSize.y;
+
+    turtleSprite.setScale({scaleTurtleX, scaleTurtleY});
+
+    //background
+    sf::Texture bgTexture;
+    if(!bgTexture.loadFromFile("background.jpeg")){
+        return -1;
+    }
+
+    sf::Sprite bgSprite(bgTexture);
+    turtleSprite.setPosition({400.f, 300.f});
+
+    //set the background to cover the entire window
+    sf::Vector2u windowSize= window->getSize();
+    sf::Vector2u textureSize= bgTexture.getSize();
+
+    //calculam factorul de scalare pe x si y
+    float scaleX= static_cast<float>(windowSize.x)/textureSize.x;
+    float scaleY= static_cast<float>(windowSize.y)/textureSize.y;
+
+    //aplicam scalarea
+    bgSprite.setScale({scaleX,scaleY});
 
     sf::Clock clock;
     float speed =500.f;
@@ -36,21 +74,36 @@ int main(){
 
         float dt=clock.restart().asSeconds();//timpul scurs de la ultimul frame
 
-
+        //moving the bubble
         if(sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::A))
-            circle1.move({-speed * dt, 0.f});
+            bubble.move({-speed * dt, 0.f});
         if(sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::D))
-            circle1.move({speed * dt, 0.f});
+            bubble.move({speed * dt, 0.f});
         if(sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::W))
-            circle1.move({ 0.f, -speed * dt});
+            bubble.move({ 0.f, -speed * dt});
         if(sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::S))
-            circle1.move({ 0.f, speed * dt});
+            bubble.move({ 0.f, speed * dt});
+
+
+
+        //moving the turtle
+        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::Left))
+            turtleSprite.move({-speed * dt, 0.f});
+        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::Right))
+            turtleSprite.move({speed * dt, 0.f});
+        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::Up))
+            turtleSprite.move({ 0.f, -speed * dt});
+        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::Down))
+            turtleSprite.move({ 0.f, speed * dt});
 
         //render
         window->clear();
 
+
         //drawing
-        window->draw(circle1);
+        window->draw(bgSprite);
+        window->draw(bubble);
+        window->draw(turtleSprite);
 
         window->display();
     }
