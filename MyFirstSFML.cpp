@@ -1,8 +1,12 @@
 
 #include <iostream>
 #include <SFML/Graphics.hpp>
+#include <cstdlib> //pt rand()
+#include <ctime> //pt time()
 
 int main(){
+
+    std::srand(static_cast<unsigned>(std::time(nullptr)));//initializarea random
 
     unsigned int height = 600;
     unsigned int width = 800;
@@ -49,7 +53,12 @@ int main(){
     //aplicam scalarea
     bgSprite.setScale({scaleX,scaleY});
 
+    //directia random
+    float dx=(std::rand() % 201-100) /50.f;
+    float dy=(std::rand() % 201-100) /50.f;
+
     sf::Clock clock;
+    sf::Clock changeDirectionClock;
     float speed =500.f;
 
     while(window->isOpen()){
@@ -74,28 +83,31 @@ int main(){
 
         float dt=clock.restart().asSeconds();//timpul scurs de la ultimul frame
 
-        //moving the bubble
-        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::A))
-            bubble.move({-speed * dt, 0.f});
-        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::D))
-            bubble.move({speed * dt, 0.f});
-        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::W))
-            bubble.move({ 0.f, -speed * dt});
-        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::S))
-            bubble.move({ 0.f, speed * dt});
+        //moving the bubble random
+        if(changeDirectionClock.getElapsedTime().asSeconds()>2.f){
+            dx = (std::rand() % 201 - 100) / 50.f;
+            dy = (std::rand() % 201 - 100) / 50.f;
+            changeDirectionClock.restart();
+        }
+
+        bubble.move({dx* speed * dt, dy* speed* dt});
 
         //verificam marginile pentru bubble
         {
             auto bounds = bubble.getGlobalBounds();
             sf::Vector2f pos = bubble.getPosition();
             if (bounds.position.x < 0)
-                pos.x = 0;
+                {pos.x = 0;
+                dx=-dx;}
             if (bounds.position.y < 0)
-                pos.y = 0;
+                {pos.y = 0;
+                dy=-dy;}
             if (bounds.position.x + bounds.size.x > width)
-                pos.x = width - bounds.size.x;
+                {pos.x = width - bounds.size.x;
+                dx=-dx;}
             if (bounds.position.y + bounds.size.y > height)
-                pos.y = height - bounds.size.y;
+                {pos.y = height - bounds.size.y;
+                dy=-dy;}
 
             bubble.setPosition(pos);
         }
