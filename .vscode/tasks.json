@@ -15,7 +15,8 @@
 			"-L\"D:/libraries/SFML-3.0.0/lib\"",
 			"-lsfml-graphics",
 			"-lsfml-window",
-			"-lsfml-system"
+			"-lsfml-system",
+
 			
 		],
 

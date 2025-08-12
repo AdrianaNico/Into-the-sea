@@ -3,6 +3,7 @@
 #include <SFML/Graphics.hpp>
 #include <cstdlib> //pt rand()
 #include <ctime> //pt time()
+#include <vector>
 
 int main(){
 
@@ -11,6 +12,29 @@ int main(){
     unsigned int height = 600;
     unsigned int width = 800;
     sf::RenderWindow* window = new sf::RenderWindow(sf::VideoMode({width, height}), "Into the Sea");
+    
+    int lives=3;
+    float heartScale=0.15f;
+    float margin=1.f;
+    float spacing=1.f;
+    sf::Texture heartTexture;
+    if(!heartTexture.loadFromFile("heart.png")){
+        return -1;
+    }
+
+    std::vector<sf::Sprite> hearts;
+    for( int i=0;i<3;i++){
+        sf::Sprite heart(heartTexture);
+        heart.setScale({heartScale, heartScale});
+        heart.setPosition({margin + i * (heartTexture.getSize().x * heartScale + spacing), margin});
+        hearts.push_back(heart);
+    }
+    //font
+    // sf::Font font;
+    // if(!font.loadFromFile("HennyPenny-Regular.ttf")){
+    //     return -1;
+    // }
+
     //bubble
     sf::CircleShape bubble(30.f);
     bubble.setFillColor(sf::Color(173, 216, 230));
@@ -77,6 +101,15 @@ int main(){
                 //update view
                 sf::View view(sf::FloatRect({0.f, 0.f}, sf::Vector2f(window->getSize())));
                 window->setView(view);
+
+                //scalarea bg ului
+                sf::Vector2u newSize = window->getSize();
+                sf::Vector2u textureSize = bgTexture.getSize();
+
+                float scaleX = static_cast<float>(newSize.x) / textureSize.x;
+                float scaleY = static_cast<float>(newSize.y) / textureSize.y;
+
+                bgSprite.setScale({scaleX, scaleY});
             }
 
         }
@@ -102,11 +135,11 @@ int main(){
             if (bounds.position.y < 0)
                 {pos.y = 0;
                 dy=-dy;}
-            if (bounds.position.x + bounds.size.x > width)
-                {pos.x = width - bounds.size.x;
+            if (bounds.position.x + bounds.size.x > window->getSize().x)
+                {pos.x = window->getSize().x - bounds.size.x;
                 dx=-dx;}
-            if (bounds.position.y + bounds.size.y > height)
-                {pos.y = height - bounds.size.y;
+            if (bounds.position.y + bounds.size.y > window->getSize().y)
+                {pos.y = window->getSize().y - bounds.size.y;
                 dy=-dy;}
 
             bubble.setPosition(pos);
@@ -130,10 +163,10 @@ int main(){
                 pos.x = 0;
             if (bounds.position.y < 0)
                 pos.y = 0;
-            if (bounds.position.x + bounds.size.x > width)
-                pos.x = width - bounds.size.x;
-            if (bounds.position.y + bounds.size.y > height)
-                pos.y = height - bounds.size.y;
+            if (bounds.position.x + bounds.size.x > window->getSize().x)
+                pos.x = window->getSize().x - bounds.size.x;
+            if (bounds.position.y + bounds.size.y > window->getSize().y)
+                pos.y = window->getSize().y - bounds.size.y;
 
             turtleSprite.setPosition(pos);
         }
@@ -146,6 +179,9 @@ int main(){
         window->draw(bgSprite);
         window->draw(bubble);
         window->draw(turtleSprite);
+        for (int i = 0; i < lives; ++i) {
+            window->draw(hearts[i]);
+}
 
         window->display();
     }
