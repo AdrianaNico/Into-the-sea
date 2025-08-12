@@ -84,7 +84,21 @@ int main(){
         if(sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::S))
             bubble.move({ 0.f, speed * dt});
 
+        //verificam marginile pentru bubble
+        {
+            auto bounds = bubble.getGlobalBounds();
+            sf::Vector2f pos = bubble.getPosition();
+            if (bounds.position.x < 0)
+                pos.x = 0;
+            if (bounds.position.y < 0)
+                pos.y = 0;
+            if (bounds.position.x + bounds.size.x > width)
+                pos.x = width - bounds.size.x;
+            if (bounds.position.y + bounds.size.y > height)
+                pos.y = height - bounds.size.y;
 
+            bubble.setPosition(pos);
+        }
 
         //moving the turtle
         if(sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::Left))
@@ -96,6 +110,22 @@ int main(){
         if(sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::Down))
             turtleSprite.move({ 0.f, speed * dt});
 
+        //verificam marginile lui turtle 
+        {
+            auto bounds = turtleSprite.getGlobalBounds();
+            sf::Vector2f pos = turtleSprite.getPosition();
+            if (bounds.position.x < 0)
+                pos.x = 0;
+            if (bounds.position.y < 0)
+                pos.y = 0;
+            if (bounds.position.x + bounds.size.x > width)
+                pos.x = width - bounds.size.x;
+            if (bounds.position.y + bounds.size.y > height)
+                pos.y = height - bounds.size.y;
+
+            turtleSprite.setPosition(pos);
+        }
+            
         //render
         window->clear();
 
