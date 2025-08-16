@@ -65,7 +65,7 @@ int main(){
 
     sf::Sprite bgSprite(bgTexture);
     turtleSprite.setPosition({400.f, 300.f});
-\
+
     //window & bg size
     sf::Vector2u textureSize= bgTexture.getSize();
     sf::Vector2u windowSize= window->getSize();
@@ -77,14 +77,28 @@ int main(){
         return -1;
     }
     sf::Sprite StartSprite(StartTexture);
-    float StartScale=0.5f;
-    StartSprite.setScale({StartScale, StartScale});
+    float ButtonScale=0.5f;
+    StartSprite.setScale({ButtonScale, ButtonScale});
     sf::Vector2u startSize = StartTexture.getSize();
     StartSprite.setPosition({
-        (windowSize.x - startSize.x * StartScale) / 2.f,
-        (windowSize.y - startSize.y * StartScale) / 2.f
+        (windowSize.x - startSize.x * ButtonScale) / 2.f,
+        (windowSize.y - startSize.y * ButtonScale) / 2.f
     });
 
+        
+    sf::Texture RestartButtonTexture;
+    if(!RestartButtonTexture.loadFromFile("restartButton.png")){
+        return -1;
+    }
+    sf::Sprite RestartButtonSprite(RestartButtonTexture);
+    RestartButtonSprite.setScale({ButtonScale, ButtonScale});
+    sf::Vector2u restartSize= RestartButtonTexture.getSize();
+    
+    RestartButtonSprite.setPosition({
+        (windowSize.x- restartSize.x* ButtonScale)/2.f,
+        (windowSize.y- restartSize.y* ButtonScale)/2.f,
+
+    });
 
     //set the background to cover the entire window
 
@@ -102,9 +116,12 @@ int main(){
     sf::Clock clock;
     sf::Clock changeDirectionClock;
     float speed =500.f;
+    sf::Clock lifeCoolDownClock;
+    float lifeCoolDown=1.f;
 
 
     bool inGame= false;// suntem inca in meniul de start
+    bool gameOver=false;// daca pierd jocul
 
     while(window->isOpen()){
 
@@ -134,8 +151,8 @@ int main(){
 
                 //update button
                 StartSprite.setPosition({
-                    (newSize.x - startSize.x * StartScale) / 2.f,
-                    (newSize.y - startSize.y * StartScale) / 2.f,
+                    (newSize.x - startSize.x * ButtonScale) / 2.f,
+                    (newSize.y - startSize.y * ButtonScale) / 2.f,
 
                 });
             }
@@ -145,6 +162,11 @@ int main(){
                     sf::Vector2f mousePos = window->mapPixelToCoords(pixelPos);// convertim pixelii la coordonate
                     if(StartSprite.getGlobalBounds().contains(mousePos)){
                         inGame=true;
+                        lives=3;
+                    }
+                    if(gameOver && RestartButtonSprite.getGlobalBounds().contains(mousePos)){
+                        inGame=true;
+                        gameOver=false;
                         lives=3;
                     }
                 }
@@ -208,9 +230,21 @@ int main(){
 
             turtleSprite.setPosition(pos);
         }
-        
+
 
         if(inGame){
+            if (bubble.getGlobalBounds().findIntersection(turtleSprite.getGlobalBounds())){
+                if(lifeCoolDownClock.getElapsedTime().asSeconds()>lifeCoolDown){
+                    lives--;
+                    lifeCoolDownClock.restart();
+                    if(lives<=0){
+                        inGame=false;
+                        gameOver=true;
+                        window->draw(RestartButtonSprite);
+                }
+                
+                }
+            }
 
 
         }
@@ -221,7 +255,10 @@ int main(){
         //drawing
         window->draw(bgSprite);
         window->draw(turtleSprite);
-        if(!inGame){
+        if(gameOver){
+            window->draw(RestartButtonSprite);
+        }
+        else if(!inGame){
             window->draw(StartSprite);
         }
         else{
