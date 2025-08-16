@@ -65,10 +65,28 @@ int main(){
 
     sf::Sprite bgSprite(bgTexture);
     turtleSprite.setPosition({400.f, 300.f});
+\
+    //window & bg size
+    sf::Vector2u textureSize= bgTexture.getSize();
+    sf::Vector2u windowSize= window->getSize();
+
+
+    //start button
+    sf::Texture StartTexture;
+    if(!StartTexture.loadFromFile("startButton.png")){
+        return -1;
+    }
+    sf::Sprite StartSprite(StartTexture);
+    float StartScale=0.5f;
+    StartSprite.setScale({StartScale, StartScale});
+    sf::Vector2u startSize = StartTexture.getSize();
+    StartSprite.setPosition({
+        (windowSize.x - startSize.x * StartScale) / 2.f,
+        (windowSize.y - startSize.y * StartScale) / 2.f
+    });
+
 
     //set the background to cover the entire window
-    sf::Vector2u windowSize= window->getSize();
-    sf::Vector2u textureSize= bgTexture.getSize();
 
     //calculam factorul de scalare pe x si y
     float scaleX= static_cast<float>(windowSize.x)/textureSize.x;
@@ -84,6 +102,9 @@ int main(){
     sf::Clock clock;
     sf::Clock changeDirectionClock;
     float speed =500.f;
+
+
+    bool inGame= false;// suntem inca in meniul de start
 
     while(window->isOpen()){
 
@@ -110,6 +131,23 @@ int main(){
                 float scaleY = static_cast<float>(newSize.y) / textureSize.y;
 
                 bgSprite.setScale({scaleX, scaleY});
+
+                //update button
+                StartSprite.setPosition({
+                    (newSize.x - startSize.x * StartScale) / 2.f,
+                    (newSize.y - startSize.y * StartScale) / 2.f,
+
+                });
+            }
+            else if(const auto* mousePressed = event->getIf<sf::Event::MouseButtonPressed>()){
+                if(mousePressed->button == sf::Mouse::Button::Left && !inGame){
+                    sf::Vector2i pixelPos = sf::Mouse::getPosition(*window);//gasim "coord" in pixeli
+                    sf::Vector2f mousePos = window->mapPixelToCoords(pixelPos);// convertim pixelii la coordonate
+                    if(StartSprite.getGlobalBounds().contains(mousePos)){
+                        inGame=true;
+                        lives=3;
+                    }
+                }
             }
 
         }
@@ -170,15 +208,25 @@ int main(){
 
             turtleSprite.setPosition(pos);
         }
-            
+        
+
+        if(inGame){
+
+
+        }
         //render
         window->clear();
 
 
         //drawing
         window->draw(bgSprite);
-        window->draw(bubble);
         window->draw(turtleSprite);
+        if(!inGame){
+            window->draw(StartSprite);
+        }
+        else{
+            window->draw(bubble);
+        }
         for (int i = 0; i < lives; ++i) {
             window->draw(hearts[i]);
 }
